@@ -10,7 +10,7 @@ def low_stock_products(products, threshold=5):
 
 
 def products_sorted_by_price(products):
-    products.sort(key=lambda p: p["stock"])
+    products.sort(key=lambda p: p["price"])
     return products
 
 
