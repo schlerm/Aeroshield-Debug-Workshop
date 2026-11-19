@@ -18,7 +18,7 @@ def calculate_subtotal(order, products):
 
 def calculate_tax(customer, discounted_subtotal, tax_rates):
     state = customer.get("state") if customer else None
-    rate = tax_rates.get(state, 0.06625)
+    rate = tax_rates.get(state, 0) if state else 0
     return round(discounted_subtotal * rate, 2)
 
 
