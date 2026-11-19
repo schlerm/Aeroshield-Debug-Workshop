@@ -34,6 +34,23 @@ def process_order(order, products, customers, tax_rates):
     customer = find_customer_by_id(customers, order.get("customer_id"))
 
     errors = validate_order(order, products, customers)
+    if errors:
+        return {
+            "order_id": order.get("id"),
+            "customer": customer["name"] if customer is not None else "UNKNOWN",
+            "valid": False,
+            "errors": errors,
+            "subtotal": 0.0,
+            "discounts": {
+                "coupon_discount": 0.0,
+                "loyalty_discount": 0.0,
+                "bulk_discount": 0.0,
+                "discounted_subtotal": 0.0,
+            },
+            "tax": 0.0,
+            "shipping": 0.0,
+            "total": 0.0,
+        }
 
     subtotal = calculate_subtotal(order, products)
     discounts = apply_discounts(order, customer, products, subtotal)
@@ -42,8 +59,8 @@ def process_order(order, products, customers, tax_rates):
 
     total = discounts["discounted_subtotal"] + tax + shipping
 
-    if not errors:
-        reserve_inventory(products, order)
+    if not reserve_inventory(products, order):
+        errors.append("Not enough inventory for order")
 
     return {
         "order_id": order["id"],

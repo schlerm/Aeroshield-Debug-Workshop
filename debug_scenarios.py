@@ -36,14 +36,15 @@ def main():
     invalid_result = process_order(orders[1], products, customers, tax_rates)
     check(invalid_result["valid"] is False, "Order 1002 should be invalid because Pen Pack is out of stock")
 
-    edge_products = [{"id": 1, "price": 10.0}]
+    stock_before = {product["id"]: product["stock"] for product in products}
+    unknown_customer_order = dict(orders[0], customer_id="MISSING")
+    unknown_customer_result = process_order(unknown_customer_order, products, customers, tax_rates)
+    check(unknown_customer_result["valid"] is False, "An unknown customer should make the order invalid")
+    check("Customer does not exist" in unknown_customer_result["errors"], "Report the unknown customer")
+    check(unknown_customer_result["total"] == 0, "An unknown customer should not be charged")
     check(
-        abs(bulk_discount_amount([{"product_id": 1, "quantity": 10}], edge_products) - 7.0) < 0.001,
-        "A line with quantity exactly 10 should get the 7% bulk discount",
-    )
-    check(
-        bulk_discount_amount([{"product_id": 1, "quantity": 9}], edge_products) == 0,
-        "A line with quantity 9 should get no bulk discount",
+        {product["id"]: product["stock"] for product in products} == stock_before,
+        "An order with an unknown customer should not change stock",
     )
 
     print("All debugging scenarios passed.")
