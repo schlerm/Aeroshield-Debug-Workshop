@@ -24,8 +24,10 @@ def calculate_tax(customer, discounted_subtotal, tax_rates):
 
 def calculate_shipping(discounted_subtotal):
     if discounted_subtotal > 100:
-        return 0
-    return 8.99
+        shipping = 0.00
+    else:
+        shipping = 8.99
+    return shipping
 
 
 def process_order(order, products, customers, tax_rates):
