@@ -1,6 +1,7 @@
 from data import get_products, get_customers, get_orders, get_tax_rates
 from orders import process_order, calculate_subtotal
 from reports import find_product_by_name, low_stock_products, category_summary
+from discounts import bulk_discount_amount
 
 
 def check(condition, message):
@@ -34,6 +35,16 @@ def main():
 
     invalid_result = process_order(orders[1], products, customers, tax_rates)
     check(invalid_result["valid"] is False, "Order 1002 should be invalid because Pen Pack is out of stock")
+
+    edge_products = [{"id": 1, "price": 10.0}]
+    check(
+        abs(bulk_discount_amount([{"product_id": 1, "quantity": 10}], edge_products) - 7.0) < 0.001,
+        "A line with quantity exactly 10 should get the 7% bulk discount",
+    )
+    check(
+        bulk_discount_amount([{"product_id": 1, "quantity": 9}], edge_products) == 0,
+        "A line with quantity 9 should get no bulk discount",
+    )
 
     print("All debugging scenarios passed.")
 
